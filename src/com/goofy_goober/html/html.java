@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class html {
-
+    /* You know the name of that stupid temporary solution? Production infrastructure. */
     private static Map<String, String> vars = new HashMap<>();
 
     private static List<String> tokenize(String code)
