@@ -8,9 +8,11 @@ import java.util.regex.Pattern;
 
 public class html {
 
+    private static Map<String, String> vars = new HashMap<>();
+
     private static List<String> tokenize(String code)
     {
-        Pattern pattern = Pattern.compile("(<\\/?[a-z]+>|<if\\s+[^>]+>|</if>|[^<]+)");
+        Pattern pattern = Pattern.compile("(<\\/?[a-z]+>|<if\\s+[^>]+>|</if>|<set\\s+[^>]+>|[^<]+)");
         Matcher matcher = pattern.matcher(code);
 
         List<String> tokens = new ArrayList<>();
@@ -26,9 +28,21 @@ public class html {
         return tokens;
     }
     
+
+    private static String replaceVar(String text)
+    {
+        for(Map.Entry<String, String> entry : vars.entrySet())
+        {
+            text = text.replace("{" + entry.getKey() + "}", entry.getValue());
+        }
+
+        return text;
+    }
+
     private static boolean evaluateCondition(String condition)
     {
         condition = condition.replaceAll("[<>]", "").trim();
+        condition = replaceVar(condition);
 
         if(condition.contains("=="))
         {
@@ -44,6 +58,20 @@ public class html {
         return false;
     }
 
+    private static void proccessSetTag(String setTag)
+    {
+        String content = setTag.substring(5, setTag.length() - 1).trim();
+        String[] parts = content.split("=");
+
+        if(parts.length == 2)
+        {
+            String varName = parts[0].trim();
+            String varValue = parts[1].trim().replace("\"", "");
+            
+            vars.put(varName, varValue);
+        }
+    }
+
     public static int execute(List<String> tokens)
     {
         Stack<String> stack = new Stack<>();
@@ -56,6 +84,12 @@ public class html {
 
         for(String token : tokens) 
         {
+            if(token.startsWith("<set"))
+            {
+                proccessSetTag(token);
+                continue;
+            }
+
             if(token.startsWith("<if"))
             {
                 inCondition = true;
@@ -88,13 +122,18 @@ public class html {
                 {
                     case "<p>":
                         inParagraph = true;
+                        data.clear();
                         break;
 
                     case "</p>":
-                        inParagraph = true;
+                        inParagraph = false;
 
                         if(!data.isEmpty())
                         {
+                            String content = String.join(" ", data);
+                            content = replaceVar(content);
+                            System.out.println(content);
+
                             data.clear();
                         }
                         break;
@@ -112,16 +151,13 @@ public class html {
                         break;
                 }
             }
-
-            if(!data.isEmpty())
-            {
-                System.out.println(String.join(" ", data));
-            }
         }
 
         for(String forPrint : data)
         {
-            System.out.println(forPrint);
+            String content = String.join(" ", data);
+            content = replaceVar(content);
+            System.out.println(content);
         }
 
         return 0;
