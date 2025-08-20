@@ -1,5 +1,5 @@
 # HTML: High Teto Meow Language
-Guys.... guys.... and call to the mental hospital guys....</br>
+Guys.... guys.... and call the mental hospital guys....</br>
 Yes this is HTML programming language...</br>
 We are scared too...</br>
 But it works!!!!
