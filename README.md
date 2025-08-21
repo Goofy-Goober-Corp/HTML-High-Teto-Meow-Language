@@ -5,7 +5,7 @@ We are scared too...</br>
 But it works!!!!
 
 # Example of usage
-Now go kill urself:</br>
+Simple output:</br>
 ```html
 <set hehe = "Cool">
 <set meow = "meow-meow">
@@ -28,5 +28,26 @@ Now go kill urself:</br>
     <p>Real. {meow} is not "meow"</p>
 </if>
 ```
+<br>
+Simple meowth:<br>
+
+```html
+<set a = 4>
+<set b = 2>
+
+<math c = {a} + {b}>
+
+<p>{c}</p>
+```
+<br>
+Simple input:<br>
+
+```html
+<set name = <in>>
+
+<p>Hello, {name}!</p>
+```
+
+
 Uhm... glup.</br>
 <img width="680" height="652" alt="image" src="https://github.com/user-attachments/assets/abfa621c-63d5-4916-9117-e64161d6615b" />
