@@ -128,7 +128,6 @@ public class html {
                 String mathExpr = parts[1].trim();
                 String result = evaluateMath(mathExpr);
                 vars.put(varName, result);
-                System.out.println("Установлена переменная: " + varName + " = " + result);
                 return;
             }
         }
