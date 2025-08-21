@@ -1,4 +1,4 @@
-package com.goofy_goober.html;
+package com.goofygoober;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class html {
+public class Html {
     private static Map<String, String> vars = new HashMap<>();
 
     private static List<String> tokenize(String code) {
@@ -222,7 +222,7 @@ public class html {
         Scanner inputScanner = new Scanner(System.in);
         String fuck = inputScanner.nextLine();
         // System.out.println(fuck);
-
+        inputScanner.close();
         return fuck;
     }
 
