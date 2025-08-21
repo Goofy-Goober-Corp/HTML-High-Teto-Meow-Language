@@ -39,6 +39,15 @@ Simple meowth:<br>
 
 <p>{c}</p>
 ```
+<br>
+Simple input:<br>
+
+```html
+<set name = <in>>
+
+<p>Hello, {name}!</p>
+```
+
 
 Uhm... glup.</br>
 <img width="680" height="652" alt="image" src="https://github.com/user-attachments/assets/abfa621c-63d5-4916-9117-e64161d6615b" />
