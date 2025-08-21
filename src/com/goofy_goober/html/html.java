@@ -16,7 +16,7 @@ public class html {
             "</if>|" +
             "<math\\s+[^>]+>|" +
             "</math>|" +
-            "<set\\s+(?:[a-zA-Z\\d]+)=(?:[a-zA-Z\\d]+|(?:<in\\s+(?:[a-zA-Z\\d]+)>|<in>))>|" +
+            "<set\\s+(?:[a-zA-Z\\d]+)\\s?=\\s?(?:[a-zA-Z\\d]+|(?:<in\\s+(?:[a-zA-Z\\d]+)>|<in>))\\s?>|" +
             "[^<]+)"
         );
         Matcher matcher = pattern.matcher(code);
@@ -55,10 +55,11 @@ public class html {
     private static void processSetTag(String setTag) {
         String content = setTag.substring(5, setTag.length() - 1).trim();
         String[] parts = content.split("=");
-        
+        // System.out.println(parts[1]);
+
         if(parts.length == 2) {
             String varName = parts[0].trim();
-            if (parts[1].startsWith("<in")) {
+            if (parts[1].startsWith("<in") || parts[1].startsWith(" <in")) {
                 String varValue = input();
                 vars.put(varName, varValue);
             } else {
