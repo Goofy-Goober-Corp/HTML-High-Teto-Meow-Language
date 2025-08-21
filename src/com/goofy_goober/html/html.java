@@ -10,7 +10,15 @@ public class html {
     private static Map<String, String> vars = new HashMap<>();
 
     private static List<String> tokenize(String code) {
-        Pattern pattern = Pattern.compile("(<\\/?[a-z]+>|<if\\s+[^>]+>|</if>|<math\\s+[^>]+>|</math>|<set\\s+[^>]+>|[^<]+)");
+        Pattern pattern = Pattern.compile(
+            "(<\\/?[a-z]+>|" +
+            "<if\\s+[^>]+>|" +
+            "</if>|" +
+            "<math\\s+[^>]+>|" +
+            "</math>|" +
+            "<set\\s+(?:[a-zA-Z\\d]+)=(?:[a-zA-Z\\d]+|(?:<in\\s+(?:[a-zA-Z\\d]+)>|<in>))>|" +
+            "[^<]+)"
+        );
         Matcher matcher = pattern.matcher(code);
 
         List<String> tokens = new ArrayList<>();
@@ -47,11 +55,16 @@ public class html {
     private static void processSetTag(String setTag) {
         String content = setTag.substring(5, setTag.length() - 1).trim();
         String[] parts = content.split("=");
-
+        
         if(parts.length == 2) {
             String varName = parts[0].trim();
-            String varValue = parts[1].trim().replace("\"", "");
-            vars.put(varName, varValue);
+            if (parts[1].startsWith("<in")) {
+                String varValue = input();
+                vars.put(varName, varValue);
+            } else {
+                String varValue = parts[1].trim().replace("\"", "");
+                vars.put(varName, varValue);
+            }
         }
     }
 
@@ -159,6 +172,17 @@ public class html {
                 continue;
             }
 
+            // if(token.startsWith("<in")) {
+            //     if(execBlock) {
+            //         try {
+            //             String content = token.substring(4, token.length() - 1).trim();
+            //         } catch(StringIndexOutOfBoundsException e) {
+            //             e.printStackTrace();
+            //         }
+            //         input();
+            //     }
+            // }
+
             if(execBlock) {
                 switch(token) {
                     case "<p>":
@@ -192,6 +216,14 @@ public class html {
         }
 
         return 0;
+    }
+
+    public static String input() {
+        Scanner inputScanner = new Scanner(System.in);
+        String fuck = inputScanner.nextLine();
+        // System.out.println(fuck);
+
+        return fuck;
     }
 
     public static void readFile(File file) {
