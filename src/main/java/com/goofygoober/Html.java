@@ -45,7 +45,7 @@ public class Html {
     private static boolean evaluateCondition(String condition) {
         // condition = condition.replaceAll("[<>]", "").trim();
         condition = replaceVar(condition);
-        System.out.println(condition);
+        // System.out.println(condition);
 
         if(condition.contains("==")) {
             String[] parts = condition.split("==");
@@ -69,7 +69,7 @@ public class Html {
         
         if(parts.length == 2) {
             String varName = parts[0].trim();
-            if (parts[1].startsWith("<in") || parts[1].startsWith(" <in")) {
+            if (parts[1].replaceAll("\\s+", "").startsWith("<in")) {
                 String varValue = input();
                 vars.put(varName, varValue);
             } else {
