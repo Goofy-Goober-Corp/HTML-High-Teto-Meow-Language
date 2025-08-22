@@ -229,7 +229,6 @@ public class Html {
             }
 
             if(execBlock) {
-                // Если мы внутри цикла, накапливаем токены для последующих проходов
                 if(!loopStartIndices.isEmpty() && loopCounters.peek() == 0) {
                     loopTokens.peek().add(token);
                 }
@@ -275,15 +274,16 @@ public class Html {
         return input;
     }
 
+    private static Scanner scanner;
+
     public static void readFile(File file) {
         try {
-            Scanner scanner = new Scanner(file);
+            scanner = new Scanner(file);
             StringBuilder sources = new StringBuilder();
 
             while (scanner.hasNextLine()) {
                 sources.append(scanner.nextLine()).append("\n");
             }
-            scanner.close();
 
             execute(tokenize(sources.toString()));
             
@@ -299,5 +299,7 @@ public class Html {
         }
         File file = new File(args[0]);
         readFile(file);
+
+        scanner.close();
     }
 }
