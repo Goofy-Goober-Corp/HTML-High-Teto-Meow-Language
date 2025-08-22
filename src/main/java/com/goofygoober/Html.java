@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 public class Html {
     private static Map<String, String> vars = new HashMap<>();
+    private static Scanner inputScanner = new Scanner(System.in);
 
     private static List<String> tokenize(String code) {
         Pattern pattern = Pattern.compile(
@@ -58,8 +59,7 @@ public class Html {
     private static void processSetTag(String setTag) {
         String content = setTag.substring(5, setTag.length() - 1).trim();
         String[] parts = content.split("=");
-        // System.out.println(parts[1]);
-
+        
         if(parts.length == 2) {
             String varName = parts[0].trim();
             if (parts[1].startsWith("<in") || parts[1].startsWith(" <in")) {
@@ -67,6 +67,7 @@ public class Html {
                 vars.put(varName, varValue);
             } else {
                 String varValue = parts[1].trim().replace("\"", "");
+                varValue = replaceVar(varValue);
                 vars.put(varName, varValue);
             }
         }
@@ -207,13 +208,13 @@ public class Html {
                     List<String> currentLoopTokens = loopTokens.peek();
                     int counter = loopCounters.pop() + 1;
                     loopCounters.push(counter);
-
+                    
                     if (counter > 1) {
                         currentLoopTokens.add(token);
                     }
-
+                    
                     i = loopStartIndices.peek();
-
+                    
                     if (counter == 1) {
                         continue;
                     }
@@ -268,22 +269,18 @@ public class Html {
     }
 
     public static String input() {
-        Scanner inputScanner = new Scanner(System.in);
-        String input = inputScanner.nextLine();
-        inputScanner.close();
-        return input;
+        return inputScanner.nextLine();
     }
-
-    private static Scanner scanner;
 
     public static void readFile(File file) {
         try {
-            scanner = new Scanner(file);
+            Scanner scanner = new Scanner(file);
             StringBuilder sources = new StringBuilder();
 
             while (scanner.hasNextLine()) {
                 sources.append(scanner.nextLine()).append("\n");
             }
+            scanner.close();
 
             execute(tokenize(sources.toString()));
             
@@ -300,6 +297,6 @@ public class Html {
         File file = new File(args[0]);
         readFile(file);
 
-        scanner.close();
+        inputScanner.close();
     }
 }
