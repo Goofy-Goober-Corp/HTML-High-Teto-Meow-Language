@@ -47,7 +47,22 @@ Simple input:<br>
 
 <p>Hello, {name}!</p>
 ```
+<br>
+Simple Cyclotron<br>
 
+```html
+<set i = 0>
+
+<loop>
+    <math i = {i} + 1>
+    <p>i = {i}</p>
+
+    <if {i} == 5>
+        <break>
+    </if>
+</loop>
+```
+<br>
 
 Uhm... glup.</br>
 <img width="680" height="652" alt="image" src="https://github.com/user-attachments/assets/abfa621c-63d5-4916-9117-e64161d6615b" />
