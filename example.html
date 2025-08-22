@@ -1,8 +1,10 @@
-<set name = <in>>
-<p>HAI {name}</p>
-   
-<math c = {name} + 2>
+<set i = 0>
 
-<p>
-    {c}
-</p>
+<loop>
+    <math i = {i} + 1>
+    <p>i = {i}</p>
+
+    <if {i} == 5>
+        <break>
+    </if>
+</loop>

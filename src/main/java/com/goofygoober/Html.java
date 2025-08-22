@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 public class Html {
     private static Map<String, String> vars = new HashMap<>();
+    private static Scanner inputScanner = new Scanner(System.in);
 
     private static List<String> tokenize(String code) {
         Pattern pattern = Pattern.compile(
@@ -17,6 +18,9 @@ public class Html {
             "<math\\s+[^>]+>|" +
             "</math>|" +
             "<set\\s+(?:[a-zA-Z\\d]+)\\s?=\\s?(?:[a-zA-Z\\d]+|(?:<in\\s+(?:[a-zA-Z\\d]+)>|<in>))\\s?>|" +
+            "<loop>|" +
+            "</loop>|" +
+            "<break>|" +
             "[^<]+)"
         );
         Matcher matcher = pattern.matcher(code);
@@ -55,8 +59,7 @@ public class Html {
     private static void processSetTag(String setTag) {
         String content = setTag.substring(5, setTag.length() - 1).trim();
         String[] parts = content.split("=");
-        // System.out.println(parts[1]);
-
+        
         if(parts.length == 2) {
             String varName = parts[0].trim();
             if (parts[1].startsWith("<in") || parts[1].startsWith(" <in")) {
@@ -64,6 +67,7 @@ public class Html {
                 vars.put(varName, varValue);
             } else {
                 String varValue = parts[1].trim().replace("\"", "");
+                varValue = replaceVar(varValue);
                 vars.put(varName, varValue);
             }
         }
@@ -139,13 +143,31 @@ public class Html {
     public static int execute(List<String> tokens) {
         Stack<String> data = new Stack<>();
         Stack<Boolean> condition = new Stack<>();
+        Stack<Integer> loopStartIndices = new Stack<>();
+        Stack<List<String>> loopTokens = new Stack<>();
+        Stack<Integer> loopCounters = new Stack<>();
 
         boolean inParagraph = false;
         boolean execBlock = true;
+        boolean breakLoop = false;
 
-        for(String token : tokens) {
+        for(int i = 0; i < tokens.size(); i++) {
+            if (breakLoop) {
+                if (tokens.get(i).equals("</loop>") && !loopStartIndices.isEmpty()) {
+                    breakLoop = false;
+                    loopStartIndices.pop();
+                    loopTokens.pop();
+                    loopCounters.pop();
+                }
+                continue;
+            }
+
+            String token = tokens.get(i);
+
             if(token.startsWith("<set")) {
-                processSetTag(token);
+                if(execBlock) {
+                    processSetTag(token);
+                }
                 continue;
             }
 
@@ -172,18 +194,46 @@ public class Html {
                 continue;
             }
 
-            // if(token.startsWith("<in")) {
-            //     if(execBlock) {
-            //         try {
-            //             String content = token.substring(4, token.length() - 1).trim();
-            //         } catch(StringIndexOutOfBoundsException e) {
-            //             e.printStackTrace();
-            //         }
-            //         input();
-            //     }
-            // }
+            if(token.equals("<loop>")) {
+                if(execBlock) {
+                    loopStartIndices.push(i);
+                    loopTokens.push(new ArrayList<>());
+                    loopCounters.push(0);
+                }
+                continue;
+            }
+
+            if(token.equals("</loop>")) {
+                if(execBlock && !loopStartIndices.isEmpty()) {
+                    List<String> currentLoopTokens = loopTokens.peek();
+                    int counter = loopCounters.pop() + 1;
+                    loopCounters.push(counter);
+                    
+                    if (counter > 1) {
+                        currentLoopTokens.add(token);
+                    }
+                    
+                    i = loopStartIndices.peek();
+                    
+                    if (counter == 1) {
+                        continue;
+                    }
+                }
+                continue;
+            }
+
+            if(token.equals("<break>")) {
+                if(execBlock && !loopStartIndices.isEmpty()) {
+                    breakLoop = true;
+                }
+                continue;
+            }
 
             if(execBlock) {
+                if(!loopStartIndices.isEmpty() && loopCounters.peek() == 0) {
+                    loopTokens.peek().add(token);
+                }
+
                 switch(token) {
                     case "<p>":
                         inParagraph = true;
@@ -219,11 +269,7 @@ public class Html {
     }
 
     public static String input() {
-        Scanner inputScanner = new Scanner(System.in);
-        String fuck = inputScanner.nextLine();
-        // System.out.println(fuck);
-        inputScanner.close();
-        return fuck;
+        return inputScanner.nextLine();
     }
 
     public static void readFile(File file) {
@@ -244,7 +290,13 @@ public class Html {
     }
 
     public static void main(String[] args) {
+        if (args.length == 0) {
+            System.out.println("Usage: java Html <filename>");
+            return;
+        }
         File file = new File(args[0]);
         readFile(file);
+
+        inputScanner.close();
     }
 }
