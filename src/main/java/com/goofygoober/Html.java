@@ -13,7 +13,7 @@ public class Html {
     private static List<String> tokenize(String code) {
         Pattern pattern = Pattern.compile(
             "(<\\/?[a-z]+>|" +
-            "<if\\s+[^>]+>|" +
+            "<if\\s+(?:\\{[a-zA-Z\\d]+\\}|\\d+)\\s?(?:==|!=|>|<)\\s?(?:\\{[a-zA-Z\\d]+\\}|\\d+)\\s?>|" +
             "</if>|" +
             "<math\\s+[^>]+>|" +
             "</math>|" +
@@ -43,8 +43,9 @@ public class Html {
     }
 
     private static boolean evaluateCondition(String condition) {
-        condition = condition.replaceAll("[<>]", "").trim();
+        // condition = condition.replaceAll("[<>]", "").trim();
         condition = replaceVar(condition);
+        System.out.println(condition);
 
         if(condition.contains("==")) {
             String[] parts = condition.split("==");
@@ -52,6 +53,12 @@ public class Html {
         } else if(condition.contains("!=")) {
             String[] parts = condition.split("!=");
             return !parts[0].trim().equals(parts[1].trim());
+        } else if(condition.contains(">")) {
+            String[] parts = condition.split(">");
+            return Float.parseFloat(parts[0].replaceAll("\\s+", "")) > Float.parseFloat(parts[1].replaceAll("\\s+", ""));
+        } else if(condition.contains("<")) {
+            String[] parts = condition.split("<");
+            return Float.parseFloat(parts[0].replaceAll("\\s+", "")) < Float.parseFloat(parts[1].replaceAll("\\s+", ""));
         }
         return false;
     }
@@ -172,6 +179,7 @@ public class Html {
             }
 
             if(token.startsWith("<if")) {
+                // System.out.println(token);
                 String cond = token.substring(4, token.length() - 1).trim();
                 boolean condResult = evaluateCondition(cond);
                 condition.push(condResult);
